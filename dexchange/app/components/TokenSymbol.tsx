@@ -1,16 +1,20 @@
 import React from 'react'
 import { FaChevronDown } from "react-icons/fa";
 
-const TokenSymbol = ({icon}:any) => {
+const symbol = ({icon ,image,symbol}:any) => {
     return (
         <>
             {icon ?
-                (<><div className="container w-6 h-6 border border-slate-300 flex items-center justify-center px-1 rounded-full text-[8px]">ETH</div>
-                    <label className="font-semibold px-1" >ETH</label>
+                (<><div className="container w-6 h-6 border border-slate-300 flex items-center justify-center rounded-full text-[6px]">
+                    {image != null ? <img src={image} className='p-0' ></img>:symbol}
+                    </div>
+                    <label className="font-semibold px-1" >{symbol}</label>
                     <FaChevronDown /></>)
                 :
-                (<><div className="container w-6 h-6 border border-slate-300 flex items-center justify-center px-1 rounded-full text-[8px]">ETH</div>
-                    <label className="font-semibold px-1" >ETH</label>
+                (<><div className="container w-6 h-6 border border-slate-300 flex items-center justify-center rounded-full text-[6px]">
+                    {image != null ? <img src={image} className='p-0' ></img>:symbol}
+                    </div>
+                    <label className="font-semibold px-1" >{symbol}</label>
                     </>)
             }
 
@@ -18,4 +22,4 @@ const TokenSymbol = ({icon}:any) => {
     )
 }
 
-export default TokenSymbol
+export default symbol

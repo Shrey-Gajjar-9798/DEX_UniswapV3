@@ -11,7 +11,7 @@ const Blocknumber = () => {
     useEffect(() => { 
         const interval = setInterval(() => {
             getblocknumber()
-        }, 600000);
+        }, 8000);
  
         //Clearing the interval
         return () => clearInterval(interval);

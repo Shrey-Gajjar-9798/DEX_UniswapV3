@@ -7,8 +7,24 @@ const config: HardhatUserConfig = {
       {
         version: "0.7.6",
       },
+      {
+        version: "0.8.20",
+        settings: {
+          optimizer: {
+             enabled: true,
+             runs: 200,
+          },
+       },
+      },
     ],
   },
+  networks: {
+    hardhat: {
+      forking: {
+        url: "https://mainnet.infura.io/v3/ffad543983e34fdfa394a70929beb02e",
+      }
+    }
+  }
 };
 
 export default config;
