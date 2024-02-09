@@ -8,11 +8,11 @@ async function main() {
     `Single Swap deployed to ${singleSwap.target}`
   );
 
-  const multiSwap = await ethers.deployContract("MultiSwap",["0xE592427A0AEce92De3Edee1F18E0157C05861564"]);
-  await multiSwap.waitForDeployment();
-  console.log(
-    `Single Swap deployed to ${multiSwap.target}`
-  );
+  // const multiSwap = await ethers.deployContract("MultiSwap",["0xE592427A0AEce92De3Edee1F18E0157C05861564"]);
+  // await multiSwap.waitForDeployment();
+  // console.log(
+  //   `Single Swap deployed to ${multiSwap.target}`
+  // );
 
 }
 
