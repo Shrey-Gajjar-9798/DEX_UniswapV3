@@ -31,7 +31,7 @@ const Modal = ({ setsymbol,setimage, name, setaddress }: any) => {
                                     setimage(index.image);
                                     (document.getElementById(name)! as any)?.close()
                                 }}>
-                                <TokenSymbol image={index.image? index.image : null} symbol={index.symbol} />
+                                <TokenSymbol id={id} image={index.image? index.image : null} symbol={index.symbol} />
                             </div>
                             </>)
                     })

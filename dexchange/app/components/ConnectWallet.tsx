@@ -4,7 +4,7 @@ import { useSDK, MetaMaskProvider } from "@metamask/sdk-react";
 
 const ConnectWallet = () =>{
 
-  const { sdk, connected, connecting, account } = useSDK();
+  const { sdk, provider, account } = useSDK();
 
   const connect = async () => {
     try {
@@ -13,6 +13,7 @@ const ConnectWallet = () =>{
       console.warn(`No accounts found`, err);
     }
   };
+  
 
   const disconnect = () => {
     if (sdk) {

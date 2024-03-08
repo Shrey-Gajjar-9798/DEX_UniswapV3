@@ -1,33 +1,65 @@
 "use client"
-import React, { useState } from 'react'
-import SwapToken from './SwapToken'
+import React, { useEffect, useState } from 'react'
 import { ethers } from "ethers"
 import TokenSymbol from '../components/TokenSymbol';
 import Modal from './Modal';
-import Modal1 from './Modal';
 import { swaptransaction } from '../components/blockchain/SwapTransaction';
 import { Suspense } from 'react';
+import { FaArrowDown } from "react-icons/fa";
+import erc20ABI from  "../components/blockchain/ERC20.json"
 
 const Swap = ({ id }: any) => {
 
     const [number, setnumber] = useState<any>();
     const [oppositeNumber, setoppositeNumber] = useState<any>();
     const [ids, setIds] = useState("")
-    const [symbolA, setsymbolA] = useState("ETH")
-    const [symbolB, setsymbolB] = useState("SELECT")
-    const [imageA, setimageA] = useState("https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628")
-    const [imageB, setimageB] = useState(null)
-    const [addressA, setaddressA] = useState<string>()
-    const [addressB, setaddressB] = useState<string>()
+    const [symbolA, setsymbolA] = useState("WETH")
+    const [symbolB, setsymbolB] = useState("USDC")
+    const [imageA, setimageA] = useState("https://changenow.io/images/cached/weth.png")
+    const [imageB, setimageB] = useState("https://assets.coingecko.com/coins/images/6319/large/usdc.png?1696506694")
+    const [addressA, setaddressA] = useState<string>("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2")
+    const [addressB, setaddressB] = useState<string>("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")
+    const [signer, setsigner] = useState<ethers.providers.JsonRpcSigner>()
 
-    // You can also access via window.ethereum
+    const [balanceA, setbalanceA] = useState<string>()
 
-    // This app will only work on Sepolia to protect users
-    const SEPOLIA_CHAIN_ID = "0xAA36A7";
+    useEffect(() => {
+        if (window.ethereum) {
+            getSignerHandler(window.ethereum);
+            // getbalance(addressA, sign)
+        }
+        
+    }, [addressA]);
 
-    // Faucet contract initialization
-    // const tokensymbol;
-    // const tokenaddress;  /// future implementation for fetching the prica and balance.
+    // useEffect(() => {
+    //     if (window.ethereum) {
+    //         getSignerHandler(window.ethereum);
+    //         // getbalance(addressA, sign)
+    //     }
+        
+    // }, [addressB]);
+
+    const  getSignerHandler = async (data:any) =>{
+        var provider = new ethers.providers.Web3Provider(data)
+        // MetaMask requires requesting permission to connect users accounts
+        await provider.send("eth_requestAccounts", [])
+        // The MetaMask plugin also allows signing transactions to
+        // send ether and pay to change state within the blockchain.
+        // For this, you need the account signer...
+        const sign = await provider.getSigner()
+        setsigner(sign);
+        getbalance(addressA,sign);
+    }
+
+    const getbalance = async (token: string,sign: ethers.providers.JsonRpcSigner) => {
+        const useraddress = await sign?.getAddress()
+        console.log("user account is: ",useraddress)
+        const contract = new ethers.Contract(token, erc20ABI, sign)
+        const balance = await contract.balanceOf(useraddress)
+        const etherbalance = ethers.utils.formatEther(balance);
+        console.log("balance of user A:",etherbalance);
+        setbalanceA(etherbalance? etherbalance : "-");
+    }
 
     const handleclick = (index: any) => {
         console.log("indes", index)
@@ -41,36 +73,41 @@ const Swap = ({ id }: any) => {
 
     //Swap Transaction
     const handleSwapTransaction = async () => {
-        var signer;
-        if (window.ethereum) {
-            var provider = new ethers.providers.Web3Provider(window.ethereum)
-            // MetaMask requires requesting permission to connect users accounts
-            await provider.send("eth_requestAccounts", []);
-            // The MetaMask plugin also allows signing transactions to
-            // send ether and pay to change state within the blockchain.
-            // For this, you need the account signer...
-            signer = provider.getSigner()
-            console.log("signer", signer);
-        }
+        // var signer;
+
         if (signer) {
-            if (addressB != null && number != null) {
-                // alert("We can proceed now !")
+            if (addressB != null && number != null && addressA != null) {
+                alert("We can proceed now !")
                 await swaptransaction(addressA!, addressB, number, signer);
             }
-            else {
-                alert("Some Values are missing! ");
-            }
+            else { alert("Some Values are missing! ") }
         }
-        else{
-            alert("Metamask is not installed!")
-        }
+        else { alert("Metamask is not installed!") }
+    }
+
+    //Swap token from button click
+
+    const changeTokens = () => {
+
+        //Swap symbols
+        let temp = symbolA;
+        setsymbolA(symbolB);
+        setsymbolB(temp);
+
+        //swap Images
+        temp = imageA;
+        setimageA(imageB);
+        setimageB(temp);
+
+        //Swap addresses;
+        temp = addressA;
+        setaddressA(addressB);
+        setaddressB(temp);
     }
 
     return (
         <>
             <Suspense fallback={<span className="loading loading-ball loading-lg"></span>}>
-
-
                 <div className='container bg-white w-auto h-36 mx-4 p-4  mt-4 rounded-lg drop-shadow-md border border-slate-300 '>
                     {/* container with swap functions input, balance, token select */}
                     <div><label className="text-sm font-medium text-slate-600">You Pay</label></div>
@@ -102,10 +139,9 @@ const Swap = ({ id }: any) => {
                     </div>
                     <div className="flex justify-between">
                         <label className="text-sm font-medium text-slate-600">`$898M`</label>
-                        <label className="text-sm font-medium text-slate-600">`Balance:$893`</label>
+                        <label className="text-sm font-medium text-slate-600">{balanceA? `Balance:${balanceA}`: <span className="loading loading-dots loading-sm mr-3"></span>}</label>
                     </div>
                 </div>
-
 
                 {/* ------------------------  Lower Swap component ---------------------------------------------*/}
                 <div className='container bg-white w-auto h-36 mx-4 p-4  mt-4 rounded-lg drop-shadow-md border border-slate-300 '>
@@ -138,8 +174,13 @@ const Swap = ({ id }: any) => {
                     </div>
                 </div>
 
-                <button className='btn btn-secondary w-11/12 my-5' onClick={handleSwapTransaction}>Swap Token</button>
+                <button className='btn btn-secondary w-11/12 text-stone-50 my-5' onClick={handleSwapTransaction}>Swap Token</button>
             </Suspense>
+            <div>
+                <FaArrowDown style={{ padding: "5px", borderTop: "3px solid rgb(203 213 225)", borderBottom: "3px solid rgb(203 213 225)", fontSize: "33px", backgroundColor: "rgb(226 232 240)", borderRadius: "20px", color: "black", position: 'absolute', zIndex: 1, top: "38%", right: "45%" }}
+                    onClick={changeTokens}
+                />
+            </div>
         </>
     )
 }
